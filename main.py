@@ -1,15 +1,13 @@
+# Readitt: Reddit thread reader with AI-style voice acting
+# Built using praw (Reddit API) and pyttsx3 (text-to-speech)
+
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+
 # Tell Python exactly where to find the .env file
 dotenv_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path)
-
-# Debug print
-print("Loaded client ID:", os.getenv("REDDIT_CLIENT_ID"))
-from dotenv import load_dotenv
-load_dotenv()
-print("Loaded client ID:", os.getenv("REDDIT_CLIENT_ID"))
 import praw
 import pyttsx3
 import random
