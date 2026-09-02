@@ -1,7 +1,15 @@
-"""pyttsx3 engine — the original, OS-native fallback (macOS `say`, SAPI5, espeak)."""
+"""pyttsx3 engine — the original, OS-native fallback (macOS `say`, SAPI5, espeak).
 
+On macOS we drive the native `say` CLI instead of pyttsx3's loop, because
+pyttsx3's nsss driver is unreliable with repeated runAndWait() calls (audio
+drops out after the first utterance, and save_to_file writes invalid WAVs).
+The `say` CLI uses the exact same system voices but is rock solid.
+"""
+
+import shutil
+import subprocess
+import sys
 import tempfile
-import time
 from pathlib import Path
 
 from .base import TTSEngine
@@ -13,6 +21,10 @@ _PREFERRED_VOICE_NAMES = [
     "Ralph", "Reed", "Rishi", "Samantha", "Tessa",
 ]
 _NARRATOR_NAME = "Daniel"
+
+
+def _say_cli_available() -> bool:
+    return sys.platform == "darwin" and shutil.which("say") is not None
 
 
 class Pyttsx3Engine(TTSEngine):
@@ -28,6 +40,7 @@ class Pyttsx3Engine(TTSEngine):
 
         self._engine = pyttsx3.init()
         self._engine.setProperty("rate", rate)
+        self._use_say_cli = _say_cli_available()
 
         voices = self._engine.getProperty("voices")
         preferred = [v for v in voices if v.name in _PREFERRED_VOICE_NAMES]
@@ -67,6 +80,10 @@ class Pyttsx3Engine(TTSEngine):
         }
 
     def _say(self, voice: object, text: str) -> None:
+        if self._use_say_cli:
+            self._say_via_say_cli(voice, text)
+            return
+
         self._engine.setProperty("voice", voice.id)
         if self._save_path:
             if self._tmp_dir is None:
@@ -78,7 +95,24 @@ class Pyttsx3Engine(TTSEngine):
         else:
             self._engine.say(text)
             self._engine.runAndWait()
-            time.sleep(0.15)  # brief gap so consecutive voices don't drop out
+
+    def _say_via_say_cli(self, voice: object, text: str) -> None:
+        """Play or render one utterance with macOS's native `say` command."""
+        if self._save_path:
+            if self._tmp_dir is None:
+                self._tmp_dir = Path(tempfile.mkdtemp(prefix="readitt-"))
+            segment = self._tmp_dir / f"seg_{len(self._segments):04d}.wav"
+            subprocess.run(
+                [
+                    "say", "-v", voice.name,
+                    "-o", str(segment), "--data-format=LEI16@22050",
+                    text,
+                ],
+                check=True,
+            )
+            self._segments.append(segment)
+        else:
+            subprocess.run(["say", "-v", voice.name, text], check=True)
 
     def speak_narrator(self, text: str) -> None:
         self._say(self._narrator_voice, text)
@@ -101,6 +135,8 @@ class Pyttsx3Engine(TTSEngine):
         return self._save_path
 
     def close(self) -> None:
+        if self._use_say_cli:
+            return  # `say` handles its own lifecycle; nothing to stop
         try:
             self._engine.stop()
         except Exception:

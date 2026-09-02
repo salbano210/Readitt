@@ -41,16 +41,19 @@ def combine_wavs(paths: list[Path], out_path: Path) -> Path:
     with wave.open(str(out_path), "wb") as out:
         out.setparams(params)
         for path in paths:
-            with wave.open(str(path), "rb") as seg:
-                if (
-                    seg.getnchannels() != params.nchannels
-                    or seg.getsampwidth() != params.sampwidth
-                    or seg.getframerate() != params.framerate
-                ):
-                    raise ValueError(
-                        f"Mismatched audio format in {path.name}; cannot combine."
-                    )
-                out.writeframes(seg.readframes(seg.getnframes()))
+            try:
+                with wave.open(str(path), "rb") as seg:
+                    if (
+                        seg.getnchannels() != params.nchannels
+                        or seg.getsampwidth() != params.sampwidth
+                        or seg.getframerate() != params.framerate
+                    ):
+                        raise ValueError(
+                            f"Mismatched audio format in {path.name}; cannot combine."
+                        )
+                    out.writeframes(seg.readframes(seg.getnframes()))
+            except wave.Error as exc:
+                raise ValueError(f"Corrupt or unreadable WAV segment {path.name}: {exc}") from exc
     return out_path
 
 
