@@ -7,8 +7,7 @@
 ## 🎯 Features
 
 - 🔁 Reads top-level Reddit comments from any public thread
-- 🧑‍🏫 Narrator voice introduces each speaker (e.g., “u/jimmybob says…”)
-- 🧑‍🎤 Comment content is read in one of several expressive voices
+- 🧑‍🎤 Each commenter is read in one of several expressive voices — you can tell speakers apart by voice alone, no announcements needed
 - 🎭 **Consistent voice casting** — each Redditor keeps the same voice across threads and sessions (persisted in `~/.readitt/voices.json`, overridable with `--map`)
 - 💾 **Save to a WAV file** with `--save` and listen on your commute, plus an estimated listening time before playback
 - 🛠️ **Zero-friction onboarding** — `python main.py --setup` interactively configures your Reddit credentials, and friendly errors guide you through bad URLs, rate limits, and missing threads
@@ -97,7 +96,7 @@ python main.py <url> --map 'u/jimmybob=Samantha'
 python main.py <thread-url> --save commute.wav
 ```
 
-Readitt prints an estimated listening time up front, then writes the full thread — narrator intros included — to one WAV file you can copy to your phone.
+Readitt prints an estimated listening time up front, then writes the full thread to one WAV file you can copy to your phone.
 
 ### 🛠️ First-run setup
 

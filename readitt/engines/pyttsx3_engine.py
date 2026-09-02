@@ -1,6 +1,7 @@
 """pyttsx3 engine — the original, OS-native fallback (macOS `say`, SAPI5, espeak)."""
 
 import tempfile
+import time
 from pathlib import Path
 
 from .base import TTSEngine
@@ -77,6 +78,7 @@ class Pyttsx3Engine(TTSEngine):
         else:
             self._engine.say(text)
             self._engine.runAndWait()
+            time.sleep(0.15)  # brief gap so consecutive voices don't drop out
 
     def speak_narrator(self, text: str) -> None:
         self._say(self._narrator_voice, text)

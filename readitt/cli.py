@@ -168,7 +168,6 @@ def main(argv: list[str] | None = None) -> int:
     try:
         for author, body in prepared:
             print(f"{author}: {body[:150]}{'…' if len(body) > 150 else ''}\n")
-            engine.speak_narrator(f"{author} says:")
             engine.speak_comment(body, author)
     except KeyboardInterrupt:
         print("\n👋 Stopped.")
