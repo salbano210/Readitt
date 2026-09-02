@@ -1,0 +1,7 @@
+praw>=7.7
+python-dotenv>=1.0
+pyttsx3>=2.90
+
+# Optional: local neural TTS (better voices, still fully offline).
+# pip install piper-tts
+# piper-tts>=1.2

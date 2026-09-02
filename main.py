@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+"""Readitt: Reddit thread reader with AI-style voice acting.
+
+Usage: python main.py <thread-url> [--comments N] [--engine auto|piper|pyttsx3]
+"""
+
+from readitt.cli import main
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
 # Readitt: Reddit thread reader with AI-style voice acting
 # Built using praw (Reddit API) and pyttsx3 (text-to-speech)
 

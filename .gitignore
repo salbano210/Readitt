@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+venv/
+.venv/
+
+# Secrets
+.env
+
+# TTS artifacts
+*.wav
+*.aiff
+*.mp3
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+
